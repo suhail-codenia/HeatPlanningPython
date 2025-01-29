@@ -43,14 +43,13 @@ def main():
     structured_text = transformer.transform_text_blocks(text_blocks)
     structured_tables = transformer.transform_tables(tables)
     
-    transformer.export_to_csv(structured_text, f"{output_base}_text.csv")
-    transformer.export_to_json(structured_text, f"{output_base}_text.json")
+    # Only output JSON files
+    transformer.export_to_json(structured_text, f"{output_base}.json")
     
     for i, table in enumerate(structured_tables):
-        transformer.export_to_csv(table, f"{output_base}_table_{i}.csv")
         transformer.export_to_json(table, f"{output_base}_table_{i}.json")
     
-    print(f"Processing complete. Output files saved with base name: {output_base}")
+    print(f"Processing complete. JSON files saved with base name: {output_base}")
     return 0
 
 if __name__ == "__main__":
