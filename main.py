@@ -4,6 +4,8 @@ from src.content_classifier import ContentClassifier
 from src.data_extractor import DataExtractor
 from src.data_transformer import DataTransformer
 import os
+from pymongo import MongoClient
+import json
 
 def parse_args():
     parser = argparse.ArgumentParser(description="PDF Analysis and Data Extraction Tool")
@@ -17,6 +19,14 @@ def parse_args():
         help="Base name for output files (without extension). If not provided, uses input filename"
     )
     return parser.parse_args()
+
+def save_to_mongodb(data, collection):
+    if isinstance(data, list):
+        collection.insert_many(data)
+    elif isinstance(data, dict):
+        collection.insert_one(data)
+    else:
+        raise TypeError("Data must be a list or a dictionary")
 
 def main():
     args = parse_args()
@@ -41,13 +51,22 @@ def main():
     
     transformer = DataTransformer()
     structured_text = transformer.transform_text_blocks(text_blocks)
+    
+    structured_text = structured_text.to_dict(orient='records')
+    
     structured_tables = transformer.transform_tables(tables)
     
-    # Only output JSON files
     transformer.export_to_json(structured_text, f"{output_base}.json")
+    
+    client = MongoClient('localhost', 27017)
+    db = client['pdf_analysis']
+    collection = db['extracted_data']
+    
+    save_to_mongodb(structured_text, collection)
     
     for i, table in enumerate(structured_tables):
         transformer.export_to_json(table, f"{output_base}_table_{i}.json")
+        save_to_mongodb(table, collection)
     
     print(f"Processing complete. JSON files saved with base name: {output_base}")
     return 0
