@@ -43,6 +43,9 @@ def main():
     else:
         output_base = os.path.splitext(os.path.basename(args.input))[0]
     
+    # Create data directory if it doesn't exist
+    os.makedirs('data', exist_ok=True)
+    
     analyzer = PDFAnalyzer(args.input)
     classifier = ContentClassifier()
     
@@ -59,7 +62,7 @@ def main():
     
     structured_tables = transformer.transform_tables(tables)
     
-    transformer.export_to_json(structured_text, f"{output_base}.json")
+    transformer.export_to_json(structured_text, f"data/{output_base}.json")
     
     mongo_uri = os.getenv("MONGO_URI")
     mongo_db = os.getenv("MONGO_DB")
@@ -72,10 +75,10 @@ def main():
     save_to_mongodb(structured_text, collection)
     
     for i, table in enumerate(structured_tables):
-        transformer.export_to_json(table, f"{output_base}_table_{i}.json")
+        transformer.export_to_json(table, f"data/{output_base}_table_{i}.json")
         save_to_mongodb(table, collection)
     
-    print(f"Processing complete. JSON files saved with base name: {output_base}")
+    print(f"Processing complete. JSON files saved in 'data' folder with base name: {output_base}")
     return 0
 
 if __name__ == "__main__":
