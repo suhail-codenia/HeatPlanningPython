@@ -6,6 +6,10 @@ from src.data_transformer import DataTransformer
 import os
 from pymongo import MongoClient
 import json
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def parse_args():
     parser = argparse.ArgumentParser(description="PDF Analysis and Data Extraction Tool")
@@ -58,9 +62,14 @@ def main():
     
     transformer.export_to_json(structured_text, f"{output_base}.json")
     
-    client = MongoClient('localhost', 27017)
-    db = client['pdf_analysis']
-    collection = db['extracted_data']
+    # Use MongoDB credentials from environment variables
+    mongo_uri = os.getenv("MONGO_URI")
+    mongo_db = os.getenv("MONGO_DB")
+    mongo_collection = os.getenv("MONGO_COLLECTION")
+    
+    client = MongoClient(mongo_uri)
+    db = client[mongo_db]
+    collection = db[mongo_collection]
     
     save_to_mongodb(structured_text, collection)
     
