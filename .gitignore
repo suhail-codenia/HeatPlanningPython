@@ -1,0 +1,22 @@
+# .gitignore
+# # Python cache files
+# __pycache__/
+# *.py[cod]
+
+# # Environment variables
+# .env
+
+# # Data files
+# data/
+
+# # Jupyter Notebook checkpoints
+# .ipynb_checkpoints/
+
+# # Pytest cache
+# .cache/
+
+# # VS Code settings
+# .vscode/
+
+# # PyCharm settings
+# .idea/
